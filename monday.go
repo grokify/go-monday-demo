@@ -167,14 +167,14 @@ func AddItem(client *graphql.Client, boardID int, groupID string, itemName strin
 	req.Var("itemName", itemName)
 	req.Var("colValues", string(jsonValues))
 
-	type ItemId struct {
-		Id string `json:"id"` // Note value is numeric and not enclosed in quotes, but does not work with type int
+	type ItemID struct {
+		ID string `json:"id"` // Note value is numeric and not enclosed in quotes, but does not work with type int
 	}
 	var response struct {
-		CreateItem ItemId `json:"create_item"`
+		CreateItem ItemID `json:"create_item"`
 	}
 	err := RunRequest(client, req, &response)
-	return response.CreateItem.Id, err
+	return response.CreateItem.ID, err
 }
 
 // AddItemUpdate adds an update entry to specified item.
@@ -194,11 +194,11 @@ func AddItemUpdate(client *graphql.Client, itemID string, msg string) error {
 	req.Var("itemId", intItemID)
 	req.Var("body", msg)
 
-	type UpdateId struct {
-		Id string `json:"id"`
+	type UpdateID struct {
+		ID string `json:"id"`
 	}
 	var response struct {
-		CreateUpdate UpdateId `json:"create_update"`
+		CreateUpdate UpdateID `json:"create_update"`
 	}
 	err = RunRequest(client, req, &response)
 	return err
@@ -245,7 +245,8 @@ func GetItems(client *graphql.Client, boardID int) ([]Item, error) {
 		fmt.Println("GetItems Failed -", err)
 		return items, err
 	}
-	var responseItems []itemData = response.Boards[0].Items
+	// var responseItems []itemData = response.Boards[0].Items
+	var responseItems = response.Boards[0].Items
 	for _, responseItem := range responseItems {
 		items = append(items, Item{
 			ID:           responseItem.ID,
