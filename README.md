@@ -6,8 +6,8 @@
 [![License][license-svg]][license-url]
 [![Discuss][forum-svg]][forum-url]
 
- [build-status-svg]: https://github.com/grokify/go-monday/workflows/go%20build/badge.svg
- [build-status-url]: https://github.com/grokify/go-monday/actions
+ [build-status-svg]: https://github.com/grokify/go-monday/workflows/test/badge.svg
+ [build-status-url]: https://github.com/grokify/go-monday/actions/workflows/test.yaml
  [goreport-svg]: https://goreportcard.com/badge/github.com/grokify/go-monday
  [goreport-url]: https://goreportcard.com/report/github.com/grokify/go-monday
  [docs-godoc-svg]: https://pkg.go.dev/badge/github.com/grokify/go-monday
