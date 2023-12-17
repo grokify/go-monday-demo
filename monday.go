@@ -62,7 +62,7 @@ func GetBoards(client *graphql.Client) ([]Board, error) {
 }
 
 // GetGroups returns []Group for specified board.
-func GetGroups(client *graphql.Client, boardId int) ([]Group, error) {
+func GetGroups(client *graphql.Client, boardID int) ([]Group, error) {
 	req := graphql.NewRequest(`
 		query ($boardId: [Int]) {
 			boards (ids: $boardId) {
@@ -72,7 +72,7 @@ func GetGroups(client *graphql.Client, boardId int) ([]Group, error) {
             }
         }
 	`)
-	req.Var("boardId", []int{boardId})
+	req.Var("boardId", []int{boardID})
 	type board struct {
 		Groups []Group `json:"groups"`
 	}
@@ -83,8 +83,8 @@ func GetGroups(client *graphql.Client, boardId int) ([]Group, error) {
 	return response.Boards[0].Groups, err
 }
 
-// GetColumns returns []Column for specified boardId.
-func GetColumns(client *graphql.Client, boardId int) ([]Column, error) {
+// GetColumns returns []Column for specified `boardID“.
+func GetColumns(client *graphql.Client, boardID int) ([]Column, error) {
 	req := graphql.NewRequest(`
 	    query ($boardId: [Int]) {
             boards (ids: $boardId) {
@@ -92,7 +92,7 @@ func GetColumns(client *graphql.Client, boardId int) ([]Column, error) {
             }
         }
     `)
-	req.Var("boardId", []int{boardId})
+	req.Var("boardId", []int{boardID})
 	type board struct {
 		Columns []Column `json:"columns"`
 	}
@@ -104,11 +104,11 @@ func GetColumns(client *graphql.Client, boardId int) ([]Column, error) {
 }
 
 // CreateColumnMap returns map[string]Column for specified boardId. Key is columnId.
-func CreateColumnMap(client *graphql.Client, boardId int) (ColumnMap, error) {
+func CreateColumnMap(client *graphql.Client, boardID int) (ColumnMap, error) {
 	var columns []Column
 	columnMap := make(ColumnMap)
 
-	columns, err := GetColumns(client, boardId)
+	columns, err := GetColumns(client, boardID)
 	if err != nil {
 		return columnMap, err
 	}
@@ -151,7 +151,7 @@ func BuildPeople(userIds ...int) People {
 }
 
 // AddItem adds 1 item to specified board/group. The id of the added item is returned.
-func AddItem(client *graphql.Client, boardId int, groupId string, itemName string, columnValues map[string]interface{}) (string, error) {
+func AddItem(client *graphql.Client, boardID int, groupID string, itemName string, columnValues map[string]interface{}) (string, error) {
 	req := graphql.NewRequest(`
         mutation ($boardId: Int!, $groupId: String!, $itemName: String!, $colValues: JSON!) {
             create_item (board_id: $boardId, group_id: $groupId, item_name: $itemName, column_values: $colValues ) {
@@ -162,8 +162,8 @@ func AddItem(client *graphql.Client, boardId int, groupId string, itemName strin
 	jsonValues, _ := json.Marshal(&columnValues)
 	log.Println(string(jsonValues))
 
-	req.Var("boardId", boardId)
-	req.Var("groupId", groupId)
+	req.Var("boardId", boardID)
+	req.Var("groupId", groupID)
 	req.Var("itemName", itemName)
 	req.Var("colValues", string(jsonValues))
 
@@ -178,8 +178,8 @@ func AddItem(client *graphql.Client, boardId int, groupId string, itemName strin
 }
 
 // AddItemUpdate adds an update entry to specified item.
-func AddItemUpdate(client *graphql.Client, itemId string, msg string) error {
-	intItemId, err := strconv.Atoi(itemId)
+func AddItemUpdate(client *graphql.Client, itemID string, msg string) error {
+	intItemID, err := strconv.Atoi(itemID)
 	if err != nil {
 		log.Println("AddItemUpdate - bad itemId", err)
 		return err
@@ -191,7 +191,7 @@ func AddItemUpdate(client *graphql.Client, itemId string, msg string) error {
 			}
 		}
 	`)
-	req.Var("itemId", intItemId)
+	req.Var("itemId", intItemID)
 	req.Var("body", msg)
 
 	type UpdateId struct {
@@ -205,7 +205,7 @@ func AddItemUpdate(client *graphql.Client, itemId string, msg string) error {
 }
 
 // GetItems returns []Item for all items in specified board.
-func GetItems(client *graphql.Client, boardId int) ([]Item, error) {
+func GetItems(client *graphql.Client, boardID int) ([]Item, error) {
 	req := graphql.NewRequest(`	
 		query ($boardId: [Int]) {
 			boards (ids: $boardId){
@@ -222,13 +222,13 @@ func GetItems(client *graphql.Client, boardId int) ([]Item, error) {
 			}
 		}	
 	`)
-	req.Var("boardId", []int{boardId})
+	req.Var("boardId", []int{boardID})
 
 	type group struct {
-		Id string `json:"id"`
+		ID string `json:"id"`
 	}
 	type itemData struct {
-		Id           string        `json:"id"`
+		ID           string        `json:"id"`
 		Group        group         `json:"group"`
 		Name         string        `json:"name"`
 		ColumnValues []ColumnValue `json:"column_values"`
@@ -248,8 +248,8 @@ func GetItems(client *graphql.Client, boardId int) ([]Item, error) {
 	var responseItems []itemData = response.Boards[0].Items
 	for _, responseItem := range responseItems {
 		items = append(items, Item{
-			ID:           responseItem.Id,
-			GroupID:      responseItem.Group.Id,
+			ID:           responseItem.ID,
+			GroupID:      responseItem.Group.ID,
 			Name:         responseItem.Name,
 			ColumnValues: responseItem.ColumnValues,
 		})
@@ -337,13 +337,13 @@ func DecodeDropDown(valueIn string) []string {
 
 // DecodeLabels displays index value of all labels for a column. Uses column settings_str (see GetColumns).
 // Use for Status(color) and Dropdown fields.
-func DecodeLabels(settings_str, columnType string) {
+func DecodeLabels(settingsStr, columnType string) {
 	var statusLabels struct {
 		Labels         map[string]string `json:"labels"`             // index: label
 		LabelPositions map[string]int    `json:"label_positions_v2"` // index: position
 	}
 	type dropdownEntry struct {
-		Id   int    `json:"id"`
+		ID   int    `json:"id"`
 		Name string `json:"name"`
 	}
 	var dropdownLabels struct {
@@ -351,7 +351,7 @@ func DecodeLabels(settings_str, columnType string) {
 	}
 
 	if columnType == "color" {
-		err := json.Unmarshal([]byte(settings_str), &statusLabels)
+		err := json.Unmarshal([]byte(settingsStr), &statusLabels)
 		if err != nil {
 			log.Fatal("DecodeLabels Failed", err)
 		}
@@ -360,12 +360,12 @@ func DecodeLabels(settings_str, columnType string) {
 		}
 	}
 	if columnType == "dropdown" {
-		err := json.Unmarshal([]byte(settings_str), &dropdownLabels)
+		err := json.Unmarshal([]byte(settingsStr), &dropdownLabels)
 		if err != nil {
 			log.Fatal("DecodeLabels Failed", err)
 		}
 		for _, label := range dropdownLabels.Labels {
-			fmt.Println(label.Id, label.Name)
+			fmt.Println(label.ID, label.Name)
 		}
 	}
 }
