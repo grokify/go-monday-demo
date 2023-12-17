@@ -271,12 +271,12 @@ func GetItems(client *graphql.Client, boardID int) ([]Item, error) {
 // Use CreateColumnMap to create the columnMap (contains info for all columns in board)
 func DecodeValue(columnMap ColumnMap, columnValue ColumnValue) (result1 string, result2 []string, err error) {
 	if columnValue.Value == "" {
-		return
+		return result1, result2, err
 	}
 	column, found := columnMap[columnValue.ID]
 	if !found {
 		err = errors.New("invalid column id - " + columnValue.ID)
-		return
+		return result1, result2, err
 	}
 	inVal := []byte(columnValue.Value) // convert input value (string) to []byte, required by json.Unmarshal
 	switch column.Type {
@@ -301,7 +301,7 @@ func DecodeValue(columnMap ColumnMap, columnValue ColumnValue) (result1 string, 
 	default:
 		err = errors.New("value type not handled - " + column.Type)
 	}
-	return
+	return result1, result2, err
 }
 
 // DecodePeople returns user id of each person assigned. Use GetUsers to get all user id values.
