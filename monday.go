@@ -113,7 +113,7 @@ func CreateColumnMap(client *graphql.Client, boardId int) (ColumnMap, error) {
 		return columnMap, err
 	}
 	for _, column := range columns {
-		columnMap[column.Id] = column
+		columnMap[column.ID] = column
 	}
 	return columnMap, nil
 }
@@ -248,8 +248,8 @@ func GetItems(client *graphql.Client, boardId int) ([]Item, error) {
 	var responseItems []itemData = response.Boards[0].Items
 	for _, responseItem := range responseItems {
 		items = append(items, Item{
-			Id:           responseItem.Id,
-			GroupId:      responseItem.Group.Id,
+			ID:           responseItem.Id,
+			GroupID:      responseItem.Group.Id,
 			Name:         responseItem.Name,
 			ColumnValues: responseItem.ColumnValues,
 		})
@@ -258,19 +258,23 @@ func GetItems(client *graphql.Client, boardId int) ([]Item, error) {
 }
 
 // DecodeValues converts column value returned from Monday to a string value
-// 	color(status) returns index of label chosen, ex. "3"
-// 	boolean(checkbox) returns "true" or "false"
-// 	date returns "2019-05-22"
+//
+//	color(status) returns index of label chosen, ex. "3"
+//	boolean(checkbox) returns "true" or "false"
+//	date returns "2019-05-22"
+//
 // Types "multi-person" and "dropdown" may have multiple values.
-//		for these, a slice of strings is returned
+//
+//	for these, a slice of strings is returned
+//
 // Use CreateColumnMap to create the columnMap (contains info for all columns in board)
 func DecodeValue(columnMap ColumnMap, columnValue ColumnValue) (result1 string, result2 []string, err error) {
 	if columnValue.Value == "" {
 		return
 	}
-	column, found := columnMap[columnValue.Id]
+	column, found := columnMap[columnValue.ID]
 	if !found {
-		err = errors.New("invalid column id - " + columnValue.Id)
+		err = errors.New("invalid column id - " + columnValue.ID)
 		return
 	}
 	inVal := []byte(columnValue.Value) // convert input value (string) to []byte, required by json.Unmarshal
@@ -309,7 +313,7 @@ func DecodePeople(valueIn string) []string {
 	}
 	result := make([]string, len(val.PersonsAndTeams))
 	for i, person := range val.PersonsAndTeams {
-		result[i] = strconv.Itoa(person.Id)
+		result[i] = strconv.Itoa(person.ID)
 	}
 	return result
 }
